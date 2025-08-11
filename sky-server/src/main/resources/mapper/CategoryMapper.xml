@@ -16,5 +16,13 @@
         order by sort asc , create_time desc
     </select>
 
+    <update id="update">
+        update category
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="sort != null">sort = #{sort},</if>
+        </set>
+        where id = #{id}
+    </update>
 
 </mapper>

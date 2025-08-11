@@ -64,6 +64,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void deleteById(Long id) {
-
+        categoryMapper.deleteById(id);
     }
 }

@@ -1,5 +1,7 @@
 package com.sky.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sky.context.BaseContext;
 import com.sky.dto.CategoryDTO;
 import com.sky.dto.CategoryPageQueryDTO;
@@ -36,7 +38,13 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public PageResult pageQuery(CategoryPageQueryDTO categoryPageQueryDTO) {
-        return null;
+        // 开始分页查询
+        PageHelper.startPage(categoryPageQueryDTO.getPage(), categoryPageQueryDTO.getPageSize());
+        Page<Category> page = categoryMapper.pageQuery(categoryPageQueryDTO);
+
+        long total = page.getTotal();
+        List<Category> records = page.getResult();
+        return new PageResult(total, records);
     }
 
     @Override

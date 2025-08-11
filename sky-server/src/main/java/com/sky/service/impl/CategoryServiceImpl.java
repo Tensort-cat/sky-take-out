@@ -54,7 +54,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void startOrStop(Integer status, Long id) {
-
+        Category category = new Category();
+        category.setStatus(status);
+        category.setId(id);
+        category.setUpdateUser(BaseContext.getCurrentId());
+        category.setUpdateTime(LocalDateTime.now());
+        categoryMapper.update(category);
     }
 
     @Override

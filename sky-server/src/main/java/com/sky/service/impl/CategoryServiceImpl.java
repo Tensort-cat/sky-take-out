@@ -49,7 +49,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<Category> list(Integer type) {
-        return null;
+        return categoryMapper.list(type);
     }
 
     @Override

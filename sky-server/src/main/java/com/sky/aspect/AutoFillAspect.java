@@ -23,6 +23,7 @@ public class AutoFillAspect {
     /**
      * 切入点
      */
+    // 切入所有mapper中标有AutoFill注解的方法
     @Pointcut("execution(* com.sky.mapper.*.*(..)) && @annotation(com.sky.annotation.AutoFill)")
     public void autoFillPointCut() {
 
@@ -48,8 +49,8 @@ public class AutoFillAspect {
         Object entity = args[0];
 
         // 准备用于赋值的数据
-        LocalDateTime now = LocalDateTime.now();
-        Long currentId = BaseContext.getCurrentId();
+        LocalDateTime now = LocalDateTime.now(); // 时间
+        Long currentId = BaseContext.getCurrentId(); // 当前用户id
 
         // 根据当前不同的操作类型，利用反射赋值
         if (operationType == OperationType.INSERT) {

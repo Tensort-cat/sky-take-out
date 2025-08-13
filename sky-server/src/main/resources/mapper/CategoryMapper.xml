@@ -3,6 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sky.mapper.CategoryMapper">
 
+    <!--    分页查询-->
     <select id="pageQuery" resultType="com.sky.entity.Category">
         select * from category
         <where>
@@ -16,6 +17,7 @@
         order by sort asc , create_time desc
     </select>
 
+<!--    -->
     <update id="update" parameterType="com.sky.entity.Category">
         update category
         <set>

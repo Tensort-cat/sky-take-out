@@ -1,13 +1,24 @@
 package com.sky.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.sky.constant.MessageConstant;
+import com.sky.constant.StatusConstant;
 import com.sky.dto.DishDTO;
+import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
+import com.sky.exception.DeletionNotAllowedException;
+import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
+import com.sky.mapper.SetmealDishMapper;
+import com.sky.result.PageResult;
 import com.sky.service.DishService;
+import com.sky.vo.DishVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,7 +28,14 @@ public class DishServiceImpl implements DishService {
     @Autowired
     private DishMapper dishMapper;
 
+    @Autowired
+    private SetmealDishMapper setmealDishMapper;
+
+    @Autowired
+    private DishFlavorMapper dishFlavorMapper;
+
     @Override
+    @Transactional
     public void save(DishDTO dishDTO) {
         Dish dish = new Dish();
         BeanUtils.copyProperties(dishDTO, dish);
@@ -37,6 +55,46 @@ public class DishServiceImpl implements DishService {
                 flavor.setDishId(dishId);
             }
             dishMapper.insertBatch(flavors);
+        }
+    }
+
+    @Override
+    public PageResult pageQuery(DishPageQueryDTO dishPageQueryDTO) {
+        PageHelper.startPage(dishPageQueryDTO.getPage(), dishPageQueryDTO.getPageSize());
+
+        Page<DishVO> page = dishMapper.pageQuery(dishPageQueryDTO);
+
+        long total = page.getTotal();
+        List<DishVO> records = page.getResult();
+        return new PageResult(total, records);
+    }
+
+    @Override
+    @Transactional // 事务
+    public void deleteBatch(List<Long> ids) {
+        // 判断当前菜品是否能被删除
+        // 是否被起售
+        for (Long id : ids) {
+            Dish dish = dishMapper.getById(id);
+            if (dish.getStatus() == StatusConstant.ENABLE) {
+                // 商品起售中，不能删除
+                throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
+            }
+        }
+
+        // 是否和套餐关联
+        List<Long> setmealIds = setmealDishMapper.getSetmealIdsByDishIds(ids);
+        if (setmealIds != null && setmealIds.size() > 0) {
+            // 有与套餐相关联的餐品
+            throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
+        }
+
+        // 删除菜品和口味
+        for (Long dishId : ids) {
+            // 删除菜品
+            dishMapper.delete(dishId);
+            // 删除菜品关联的口味
+            dishFlavorMapper.deleteByDishId(dishId);
         }
     }
 }

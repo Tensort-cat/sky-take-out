@@ -9,6 +9,7 @@
                 #{updateUser}, #{status})
     </insert>
 
+<!--    添加口味-->
     <insert id="insertBatch">
         insert into dish_flavor (dish_id, name, value) VALUES
         <foreach collection="flavors" item="df" separator=",">
@@ -32,4 +33,20 @@
         </where>
         order by category_id asc , create_time desc
     </select>
+
+    <update id="update">
+        update dish
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="image != null">image = #{image},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="updateUser != null">update_user = #{updateUser},</if>
+        </set>
+        where id = #{id}
+    </update>
+
 </mapper>

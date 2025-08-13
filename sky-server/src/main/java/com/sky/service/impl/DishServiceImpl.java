@@ -130,4 +130,13 @@ public class DishServiceImpl implements DishService {
         // 添加关联的口味
         dishMapper.insertBatch(flavors);
     }
+
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        Dish dish = new Dish();
+        dish.setStatus(status);
+        dish.setId(id);
+
+        dishMapper.update(dish);
+    }
 }
